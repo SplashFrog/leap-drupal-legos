@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.sibling_nav
+    - field.storage.block_content.field_parent_content
+id: block_content.sibling_nav.field_parent_content
+field_name: field_parent_content
+entity_type: block_content
+bundle: sibling_nav
+label: 'Parent Page'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: views
+  handler_settings:
+    view:
+      view_name: content_reference
+      display_name: content_select_reference
+      arguments: {  }
+field_type: entity_reference

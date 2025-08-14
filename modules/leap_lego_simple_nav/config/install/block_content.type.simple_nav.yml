@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: simple_nav
+label: 'Simple Navigation'
+revision: true
+description: 'A Block Content to help construct and display a simple navigation menu.'

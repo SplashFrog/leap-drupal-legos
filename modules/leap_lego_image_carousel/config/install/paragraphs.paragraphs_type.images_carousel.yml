@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+id: images_carousel
+label: 'Images Carousel'
+icon_uuid: null
+icon_default: null
+description: 'A collection of information to show on the Image Carousel block content.'
+behavior_plugins: {  }

@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: video_carousel
+label: 'Video Carousel'
+revision: true
+description: 'A Block Content to help construct and display videos in a carousel.'

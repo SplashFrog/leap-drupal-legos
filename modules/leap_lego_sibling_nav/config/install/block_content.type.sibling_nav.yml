@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: sibling_nav
+label: 'Sibling Navigation'
+revision: true
+description: 'A Block Content to help construct and display a menu based upon Smart Paths and the selected starting content.'

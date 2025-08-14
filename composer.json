@@ -1,0 +1,22 @@
+{
+  "name": "splashfrog/leap-legos",
+  "description": "Splash Frog Layout Builder Lego Blocks",
+  "type": "drupal-module",
+  "homepage": "https://github.com/SplashFrog/leap-drupal-legos",
+  "authors": [
+    {
+      "name": "Splash Frog",
+      "email": "contact@splashfrog.io",
+      "homepage": "https://splashfrog.io",
+      "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/SplashFrog/leap-drupal-legos/issues",
+    "source": "https://github.com/SplashFrog/leap-drupal-legos.git"
+  },
+  "require" : {
+    "drupal/core": "^10.4 || ^11"
+  },
+  "license": "GPL-3.0-or-later"
+}

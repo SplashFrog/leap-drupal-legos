@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.cards
+    - field.storage.block_content.field_card_link_wrap
+id: block_content.cards.field_card_link_wrap
+field_name: field_card_link_wrap
+entity_type: block_content
+bundle: cards
+label: 'Is the link the whole card?'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

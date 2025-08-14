@@ -1,0 +1,96 @@
+<?php
+
+use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\ViewExecutable;
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function leap_lego_sibling_nav_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+  // For the auto and sibling navigation, we want to only display if the parent page exists
+  // and that it is still published.
+  if ($view->id() === 'sibling_nav') {
+    // Auto Sibling Navigation Logic.
+    if ($view->current_display === 'lego_auto_nav') {
+      $currentNode = \Drupal::routeMatch()->getParameter('node');
+      if ($currentNode instanceof NodeInterface) {
+        if ($currentNode->hasField('field_parent_content')) {
+          $parentField = $currentNode->get('field_parent_content')->getValue();
+          if (!empty($parentField)) {
+            $parentId = $parentField[0]['target_id'];
+            $parentPage = Node::load($parentId);
+            if ($parentPage instanceof Node) {
+              $isPublished = _leap_lego_sibling_nav_parent_page_published($parentPage);
+              if ($isPublished) {
+                foreach ($query->where as &$condition_group) {
+                  foreach ($condition_group['conditions'] as &$condition) {
+                    if (is_string($condition['field'])) {
+                      if (str_starts_with($condition['field'], 'node__field_parent_content.field_parent_content_target_id')) {
+                        $condition['value'] = $parentId;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Manually set sibling navigation to 0 if the selected parent page is not published.
+    if ($view->current_display === 'lego_sibling_nav') {
+      $parentId = $view->args[0];
+      $isPublished = FALSE;
+
+      if (!empty($parentId)) {
+        $parentPage = Node::load($parentId);
+        if ($parentPage instanceof Node) {
+          $isPublished = _leap_lego_sibling_nav_parent_page_published($parentPage);
+        }
+
+        // We need to set the view field to zero, so it will not show anything.
+        if (!$isPublished) {
+          foreach ($query->where as &$condition_group) {
+            foreach ($condition_group['conditions'] as &$condition) {
+              if (is_string($condition['field'])) {
+                if (str_starts_with($condition['field'], 'node__field_parent_content.field_parent_content_target_id')) {
+                  $condition['value'][array_key_first($condition['value'])] = '0';
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Check the node to see if it is published.
+ *
+ * @param Node $parentNode
+ *   The node to check.
+ * @return bool
+ *   TRUE if the Node is Published. FALSE if it is not.
+ */
+function _leap_lego_sibling_nav_parent_page_published(Node $parentNode) {
+  $isPublished = TRUE;
+  // Make sure the node is published.
+  if ($parentNode->isPublished()) {
+    // Make sure that the node isn't archived or deleted.
+    // If it doesn't have this field, then continue on.
+    if ($parentNode->hasField('moderation_state')) {
+      $modField = $parentNode->get('moderation_state')->getValue();
+      $modValue = $modField[0]['value'];
+      $isPublished = !in_array($modValue, ['archived']);
+    }
+  }
+  else {
+    $isPublished = FALSE;
+  }
+
+  return $isPublished;
+}

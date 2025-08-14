@@ -1,0 +1,87 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.cards
+    - field.field.block_content.cards.body
+    - field.field.block_content.cards.field_card_link_wrap
+    - field.field.block_content.cards.field_link
+    - field.field.block_content.cards.field_media
+    - field.field.block_content.cards.field_title
+  module:
+    - linkit_attributes
+    - media_library
+    - text
+id: block_content.cards.default
+targetEntityType: block_content
+bundle: cards
+mode: default
+content:
+  body:
+    type: text_textarea_with_summary
+    weight: 3
+    region: content
+    settings:
+      rows: 9
+      summary_rows: 3
+      placeholder: ''
+      show_summary: false
+    third_party_settings: {  }
+  field_card_link_wrap:
+    type: boolean_checkbox
+    weight: 5
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_link:
+    type: linkit_attributes
+    weight: 4
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+      linkit_profile: default
+      linkit_auto_link_text: false
+      enabled_attributes:
+        name: true
+        target: true
+        rel: true
+        class: true
+        aria-label: true
+        title: true
+        id: false
+        accesskey: false
+      widget_default_open: expandIfValuesSet
+    third_party_settings: {  }
+  field_media:
+    type: media_library_widget
+    weight: 2
+    region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+  field_title:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  info:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: 6
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
+hidden: {  }

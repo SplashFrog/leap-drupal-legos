@@ -1,0 +1,54 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.images_carousel.field_image
+    - field.field.paragraph.images_carousel.field_link
+    - field.field.paragraph.images_carousel.field_title
+    - paragraphs.paragraphs_type.images_carousel
+  module:
+    - linkit_attributes
+    - media_library
+id: paragraph.images_carousel.default
+targetEntityType: paragraph
+bundle: images_carousel
+mode: default
+content:
+  field_image:
+    type: media_library_widget
+    weight: 1
+    region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+  field_link:
+    type: linkit_attributes
+    weight: 2
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+      linkit_profile: default
+      linkit_auto_link_text: false
+      enabled_attributes:
+        name: true
+        target: true
+        rel: true
+        class: true
+        aria-label: true
+        title: true
+        id: false
+        accesskey: false
+      widget_default_open: expandIfValuesSet
+    third_party_settings: {  }
+  field_title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

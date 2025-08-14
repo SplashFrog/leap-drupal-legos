@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: image_carousel
+label: 'Image Carousel'
+revision: true
+description: 'A Block Content to help construct and display images in a carousel.'

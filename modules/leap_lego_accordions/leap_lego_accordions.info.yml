@@ -1,0 +1,9 @@
+name: 'Splash Frog Legos - Accordions'
+core_version_requirement: ^10.4 || ^11
+type: module
+version: '1.0.0'
+description: 'Provides configuration for content block for Layout Builder to design accordions. Once configuration is installed, this can be disabled.'
+package: 'Splash Frog'
+dependencies:
+  - drupal:block_content
+  - drupal:paragraphs

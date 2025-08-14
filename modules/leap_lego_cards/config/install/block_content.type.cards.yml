@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: cards
+label: Cards
+revision: true
+description: 'A Block Content to help construct and display content in a card.'

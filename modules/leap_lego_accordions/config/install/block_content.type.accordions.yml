@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: accordions
+label: Accordions
+revision: true
+description: 'A Block Content to help construct and display content in accordions.'

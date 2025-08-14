@@ -1,0 +1,11 @@
+name: 'Splash Frog Legos - Sibling / Smart Navigation'
+core_version_requirement: ^10.4 || ^11
+type: module
+version: '1.0.0'
+description: 'Provides configuration for content block for Layout Builder to show navigation based upon the Smart Paths. This provides a content block where you can specify the starting page, and a view block where you can place and it will auto-calculate and build based upon the current node.'
+package: 'Splash Frog'
+dependencies:
+  - drupal:block_content
+  - drupal:pq_starter_smartpaths
+  - drupal:viewfield
+  - drupal:views
