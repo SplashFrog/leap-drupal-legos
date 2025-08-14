@@ -6,6 +6,6 @@ description: 'Provides configuration for content block for Layout Builder to sho
 package: 'Splash Frog'
 dependencies:
   - drupal:block_content
-  - drupal:leap_starter_smartpaths
+  - drupal:leap_smartpaths
   - drupal:viewfield
   - drupal:views
