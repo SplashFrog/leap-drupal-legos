@@ -1,1 +1,16 @@
 <?php
+
+/**
+ * Implements HOOK_preprocess_paragraph__PARAGRAPH_TYPE().
+ */
+function leap_lego_accordions_preprocess_paragraph__accordions(&$variables) {
+  $paragraph = $variables['paragraph'];
+  $parent_entity = $paragraph->getParentEntity();
+  if ($parent_entity) {
+    $parentType = $parent_entity->getEntityTypeId();
+    if (in_array($parentType, ['block_content', 'inline_block'])) {
+      $id = $parent_entity->id();
+      $variables['parent_id'] = $id;
+    }
+  }
+}
