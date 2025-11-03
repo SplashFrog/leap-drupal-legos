@@ -1,1 +1,114 @@
 <?php
+/**
+ * @file
+ * Primary module file for Lego Cards.
+ */
+
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\block_content\BlockContentInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function leap_lego_cards_theme($existing, $type, $theme, $path) {
+  return [
+    // Theme hook for our custom block template.
+    'block__leap_lego__cards' => [
+      'base hook' => 'block',
+      'path' => $path . '/templates/block',
+    ],
+    // Theme hooks for our custom fields template.
+    'field__leap_lego__cards__field_media' => [
+      'base hook' => 'field',
+      'path' => $path . '/templates/field',
+    ],
+    'field__leap_lego__cards__field_title' => [
+      'base hook' => 'field',
+      'path' => $path . '/templates/field',
+    ],
+    'field__leap_lego__cards__body' => [
+      'base hook' => 'field',
+      'path' => $path . '/templates/field',
+    ],
+    'field__leap_lego__cards__image__field_image' => [
+      'base hook' => 'field',
+      'path' => $path . '/templates/field',
+    ],
+    'media__leap_lego__cards__image' => [
+      'base hook' => 'media',
+      'path' => $path . '/templates/media',
+    ]
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter() for blocks.
+ */
+function leap_lego_cards_theme_suggestions_block_alter(array &$suggestions, array $variables) {
+  // Check if we are rendering a custom block (block_content).
+  if (isset($variables['elements']['content']['#block_content'])) {
+    /** @var BlockContentInterface $block_content */
+    $block_content = $variables['elements']['content']['#block_content'];
+    $bundle = $block_content->bundle();
+
+    // If the block is of our 'special_block' type, add our custom suggestion.
+    if ($bundle === 'cards') {
+      $my_suggestion = 'block__leap_lego__cards';
+      array_splice($suggestions, 0, 0, $my_suggestion);
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter() for fields.
+ */
+function leap_lego_cards_theme_suggestions_field_alter(array &$suggestions, array $variables) {
+  $field_found = FALSE;
+  /** @var ContentEntityInterface $entity */
+  $entity = $variables['element']['#object'];
+  $field_name = $variables['element']['#field_name'];
+  $card_suggestion = null;
+
+  // Check if the field is on a 'block_content' entity of bundle 'special_block'.
+  if ($entity->getEntityTypeId() === 'block_content' && $entity->bundle() === 'cards') {
+    // If it's our special field, add the suggestion.
+    switch($field_name) {
+      case 'field_media':
+        $card_suggestion = 'field__leap_lego__cards__field_media';
+        $field_found = TRUE;
+        break;
+      case 'field_title':
+        $card_suggestion = 'field__leap_lego__cards__field_title';
+        $field_found = TRUE;
+        break;
+      case 'body':
+        $card_suggestion = 'field__leap_lego__cards__body';
+        $field_found = TRUE;
+        break;
+    }
+  }
+
+  if ($entity->getEntityTypeId() === 'media' &&
+  $entity->bundle() === 'image' &&
+  $variables['element']['#view_mode'] === 'cards' &&
+  $field_name === 'field_image') {
+    $card_suggestion = 'field__leap_lego__cards__image__field_image';
+    $field_found = TRUE;
+  }
+
+  if ($field_found && $card_suggestion) {
+    array_splice($suggestions, 0, 0, $card_suggestion);
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter() for media.
+ */
+function leap_lego_cards_theme_suggestions_media_alter(array &$suggestions, array $variables) {
+  $media = $variables['elements']['#media'];
+  if ($media->bundle() === 'image' && $variables['elements']['#view_mode'] === 'cards') {
+
+    $my_suggestion = 'media__leap_lego__cards__image';
+    array_splice($suggestions, 0, 0, $my_suggestion);
+  }
+}
