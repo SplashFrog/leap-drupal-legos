@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ * Default module theme implementation for the video carousel block content type.
+ */
+#}
+{% set block_classes = [
+  'block',
+  'block-' ~ configuration.provider|clean_class,
+  'block-' ~ plugin_id|clean_class,
+  layout ? 'layout--' ~ layout|clean_class,
+] %}
+
+<div{{ attributes.addClass(block_classes) }}>
+  {{ title_prefix }}
+  {% if label %}
+    <h2{{ title_attributes }}>{{ label }}</h2>
+  {% endif %}
+  {{ title_suffix }}
+
+  {% include 'leap_lego_video_carousel:video-carousel' with {
+    'id': carousel_id,
+    'title': content.field_title[0]['#context']['value']|default(''),
+    'body': content.body[0]|default(''),
+    'items': carousel_items
+  } only %}
+</div>

@@ -1,0 +1,10 @@
+name: 'Splash Frog Legos - Tabs'
+description: 'Provides configuration for a content block to design tabs using Layout Builder.'
+type: 'Site-Building'
+install:
+  - block_content
+  - paragraphs
+  - text
+  - entity_reference_revisions
+config:
+  strict: false

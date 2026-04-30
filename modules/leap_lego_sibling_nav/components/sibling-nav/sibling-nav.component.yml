@@ -1,0 +1,13 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/11.x/core/assets/schemas/v1/metadata.schema.json
+name: Sibling Navigation
+description: 'A wrapper component for the sibling navigation block.'
+props:
+  type: object
+  properties:
+    title:
+      type: [string, "null"]
+    body:
+      type: [string, "null"]
+    nav_content:
+      type: [string, "null"]
+      description: 'The rendered viewfield output.'

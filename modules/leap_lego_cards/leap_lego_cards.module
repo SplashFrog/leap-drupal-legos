@@ -1,1 +1,96 @@
 <?php
+
+/**
+ * @file
+ */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Hook implementations for the LEAP Lego - Cards module.
+ *
+ * This module acts as the bridge between Drupal's backend data structures
+ * (Block Content entities) and the frontend Single Directory Component (SDC)
+ * templates. It handles preprocessing, theme hook suggestions, and mapping
+ * complex field logic (like full-card link wrapping) to Twig variables.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ *
+ * Provides instructions to site builders on how to complete the installation
+ * of the Cards Lego by applying the accompanying Drupal Recipe.
+ */
+function leap_lego_cards_help(string $route_name, RouteMatchInterface $route_match): string {
+  if ($route_name === 'help.page.leap_lego_cards') {
+    $module_path = \Drupal::service('extension.list.module')->getPath('leap_lego_cards');
+    $command = "drush recipe $module_path/recipes/leap_lego_cards";
+
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('This module provides the SDC component and bridging logic for the Cards Lego. To fully configure the block types and fields, you must apply the associated recipe.') . '</p>';
+    $output .= '<h3>' . t('Installation Instructions') . '</h3>';
+    $output .= '<p>' . t('To install the pre-configured Cards block type, you must run the following Drush command from your project root:') . '</p>';
+    $output .= '<pre><code>' . $command . '</code></pre>';
+    return $output;
+  }
+  return '';
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * Registers a specific theme hook suggestion to route the Cards block
+ * content entity directly to our custom `block--lego-cards.html.twig`
+ * template, where the SDC is embedded.
+ */
+function leap_lego_cards_theme(array $existing, string $type, string $theme, string $path): array {
+  return [
+    'block__block_content__cards' => [
+      'base hook' => 'block',
+      'template' => 'block--lego-cards',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_block().
+ *
+ * Preprocesses the parent Cards block.
+ * Extracts link data and specific toggle states (like whether the entire
+ * card should act as a clickable link) and injects them as simple scalar
+ * variables for the SDC template to consume safely.
+ */
+function leap_lego_cards_preprocess_block__block_content__cards(array &$variables): void {
+  $content = $variables['content'];
+
+  // Ensure the block content entity is available.
+  if (!isset($content['#block_content'])) {
+    return;
+  }
+
+  /** @var \Drupal\block_content\Entity\BlockContent $block */
+  $block = $content['#block_content'];
+
+  // Initialize default variable states for the Twig template.
+  $variables['card_link_url'] = '';
+  $variables['card_link_title'] = '';
+  $variables['card_link_wrap'] = FALSE;
+
+  // Process the Link Field.
+  // Extract the generated absolute URL string and the link title.
+  if ($block->hasField('field_link') && !$block->get('field_link')->isEmpty()) {
+    $link_item = $block->get('field_link')->first();
+    $variables['card_link_url'] = $link_item->getUrl()->toString() ?? '';
+    $variables['card_link_title'] = $link_item->title ?? '';
+  }
+
+  // Process the Link Wrap Toggle.
+  // This boolean determines if the SDC should wrap the entire card DOM
+  // inside an anchor tag, or just render a standalone button.
+  if ($block->hasField('field_card_link_wrap')) {
+    $variables['card_link_wrap'] = (bool) $block->get('field_card_link_wrap')->value;
+  }
+}

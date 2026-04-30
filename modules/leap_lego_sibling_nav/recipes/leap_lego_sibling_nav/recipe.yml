@@ -1,0 +1,12 @@
+name: 'Splash Frog Legos - Sibling / Smart Navigation'
+description: 'Provides configuration for a content block to design sibling navigations using Layout Builder.'
+type: 'Site-Building'
+install:
+  - block_content
+  - leap_smartpaths
+  - viewfield
+  - views
+  - text
+  - tagify
+config:
+  strict: false

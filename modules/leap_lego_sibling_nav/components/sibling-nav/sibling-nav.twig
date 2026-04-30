@@ -1,0 +1,15 @@
+<div class="sf-lego-sibling-nav">
+  {% if title %}
+    <h3 class="mb-4">{{ title }}</h3>
+  {% endif %}
+  
+  {% if body %}
+    <div class="mb-4">{{ body }}</div>
+  {% endif %}
+
+  {% if nav_content %}
+    <div class="sibling-nav-list">
+      {{ nav_content }}
+    </div>
+  {% endif %}
+</div>

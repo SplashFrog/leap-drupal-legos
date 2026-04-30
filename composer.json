@@ -1,6 +1,6 @@
 {
   "name": "splashfrog/leap-legos",
-  "description": "Splash Frog Layout Builder Lego Blocks",
+  "description": "Enterprise-grade, decoupled component building blocks for Drupal 11 Layout Builder.",
   "type": "drupal-module",
   "homepage": "https://github.com/SplashFrog/leap-drupal-legos",
   "authors": [
@@ -15,8 +15,10 @@
     "issues": "https://github.com/SplashFrog/leap-drupal-legos/issues",
     "source": "https://github.com/SplashFrog/leap-drupal-legos.git"
   },
-  "require" : {
-    "drupal/core": "^10.4 || ^11"
+  "require": {
+    "php": ">=8.3",
+    "drupal/core": "^11.3",
+    "drupal/paragraphs": "^1.17"
   },
   "license": "GPL-3.0-or-later"
 }

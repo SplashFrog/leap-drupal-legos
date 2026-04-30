@@ -1,1 +1,121 @@
 <?php
+
+/**
+ * @file
+ */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Hook implementations for the LEAP Lego - Image Carousel module.
+ *
+ * This module acts as the bridge between Drupal's backend data structures
+ * (Block Content entities and associated Paragraphs) and the frontend Single
+ * Directory Component (SDC) templates. It handles preprocessing, theme hook
+ * suggestions, and rendering media entities programmatically for the carousel slides.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ *
+ * Provides instructions to site builders on how to complete the installation
+ * of the Image Carousel Lego by applying the accompanying Drupal Recipe.
+ */
+function leap_lego_image_carousel_help(string $route_name, RouteMatchInterface $route_match): string {
+  if ($route_name === 'help.page.leap_lego_image_carousel') {
+    $module_path = \Drupal::service('extension.list.module')->getPath('leap_lego_image_carousel');
+    $command = "drush recipe $module_path/recipes/leap_lego_image_carousel";
+
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('This module provides the SDC component and bridging logic for the Image Carousel Lego. To fully configure the block types and fields, you must apply the associated recipe.') . '</p>';
+    $output .= '<h3>' . t('Installation Instructions') . '</h3>';
+    $output .= '<p>' . t('To install the pre-configured Image Carousel block type, you must run the following Drush command from your project root:') . '</p>';
+    $output .= '<pre><code>' . $command . '</code></pre>';
+    return $output;
+  }
+  return '';
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * Registers a specific theme hook suggestion to route the Image Carousel block
+ * content entity directly to our custom `block--lego-image-carousel.html.twig`
+ * template, where the Bootstrap 5 SDC is embedded.
+ */
+function leap_lego_image_carousel_theme(array $existing, string $type, string $theme, string $path): array {
+  return [
+    'block__block_content__image_carousel' => [
+      'base hook' => 'block',
+      'template' => 'block--lego-image-carousel',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_block().
+ *
+ * Preprocesses the parent Image Carousel block.
+ * Iterates through the referenced paragraph slides, extracts text and link data,
+ * and programmatically renders the Media entity (images) using the entity
+ * view builder. This ensures that responsive image styles and attributes are
+ * fully calculated before being passed to the SDC.
+ */
+function leap_lego_image_carousel_preprocess_block__block_content__image_carousel(array &$variables): void {
+  $content = $variables['content'];
+
+  // Ensure the block content entity is available.
+  if (!isset($content['#block_content'])) {
+    return;
+  }
+
+  /** @var \Drupal\block_content\Entity\BlockContent $block */
+  $block = $content['#block_content'];
+
+  // Generate a unique base ID for the Bootstrap carousel controls.
+  $variables['carousel_id'] = 'carousel-' . $block->id();
+
+  $items = [];
+  // Verify the block has the expected entity reference field.
+  if ($block->hasField('field_carousel_images')) {
+    $paragraph_items = $block->get('field_carousel_images')->referencedEntities();
+
+    // Loop through each attached paragraph slide.
+    foreach ($paragraph_items as $delta => $paragraph) {
+      /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
+      $item = [
+        'media' => '',
+        'title' => ($paragraph->hasField('field_title') ? $paragraph->get('field_title')->value : '') ?? '',
+        'link_url' => '',
+        'link_title' => '',
+      ];
+
+      // Process Media Field.
+      // We use the View Builder to render the media entity so that it utilizes
+      // the configured view mode (e.g., handling responsive image styles properly).
+      if ($paragraph->hasField('field_image') && !$paragraph->get('field_image')->isEmpty()) {
+        $view_builder = \Drupal::entityTypeManager()->getViewBuilder('media');
+        $media_entity = $paragraph->get('field_image')->entity;
+        if ($media_entity) {
+          $build = $view_builder->view($media_entity, 'default');
+          $item['media'] = \Drupal::service('renderer')->render($build);
+        }
+      }
+
+      // Process Link Field.
+      if ($paragraph->hasField('field_link') && !$paragraph->get('field_link')->isEmpty()) {
+        $link_item = $paragraph->get('field_link')->first();
+        $item['link_url'] = $link_item->getUrl()->toString() ?? '';
+        $item['link_title'] = $link_item->title ?? '';
+      }
+
+      $items[] = $item;
+    }
+  }
+
+  // Inject the mapped array into the variables array for Twig.
+  $variables['carousel_items'] = $items;
+}

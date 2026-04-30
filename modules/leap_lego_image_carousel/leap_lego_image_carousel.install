@@ -1,5 +1,30 @@
 <?php
+
 /**
  * @file
- * Contains installation and update routines for Lego Image Carousel.
  */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Installation and update functions for the LEAP Lego - Image Carousel module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Provides a post-installation messenger alert with the required Drush recipe
+ * command to attach the necessary paragraph fields and block type configuration.
+ * Because LEAP Legos use pure configuration recipes rather than config/install
+ * directories, this manual prompt is essential for the site builder workflow.
+ */
+function leap_lego_image_carousel_install(): void {
+  // Dynamically determine the path for the recipe command.
+  $module_path = \Drupal::service('extension.list.module')->getPath('leap_lego_image_carousel');
+  $command = "drush recipe $module_path/recipes/leap_lego_image_carousel";
+
+  \Drupal::messenger()->addWarning(t('The Splash Frog Legos - Image Carousel module has been enabled. <strong>To complete the setup, you must apply the associated recipe:</strong><br><br><code>@command</code>', [
+    '@command' => $command,
+  ]));
+}

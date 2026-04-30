@@ -1,1 +1,94 @@
 <?php
+
+/**
+ * @file
+ */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Hook implementations for the LEAP Lego - Simple Nav module.
+ *
+ * This module acts as the bridge between Drupal's backend data structures
+ * (Block Content entities) and the frontend Single Directory Component (SDC)
+ * templates for the Simple Navigation Lego. It handles preprocessing, theme
+ * hook suggestions, and mapping multi-value link fields into a clean array
+ * for Twig consumption.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ *
+ * Provides instructions to site builders on how to complete the installation
+ * of the Simple Navigation Lego by applying the accompanying Drupal Recipe.
+ */
+function leap_lego_simple_nav_help(string $route_name, RouteMatchInterface $route_match): string {
+  if ($route_name === 'help.page.leap_lego_simple_nav') {
+    $module_path = \Drupal::service('extension.list.module')->getPath('leap_lego_simple_nav');
+    $command = "drush recipe $module_path/recipes/leap_lego_simple_nav";
+
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('This module provides the SDC component and bridging logic for the Simple Navigation Lego. To fully configure the block types and fields, you must apply the associated recipe.') . '</p>';
+    $output .= '<h3>' . t('Installation Instructions') . '</h3>';
+    $output .= '<p>' . t('To install the pre-configured Simple Navigation block type, you must run the following Drush command from your project root:') . '</p>';
+    $output .= '<pre><code>' . $command . '</code></pre>';
+    return $output;
+  }
+  return '';
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * Registers a specific theme hook suggestion to route the Simple Nav block
+ * content entity directly to our custom `block--lego-simple-nav.html.twig`
+ * template, where the SDC is embedded.
+ */
+function leap_lego_simple_nav_theme(array $existing, string $type, string $theme, string $path): array {
+  return [
+    'block__block_content__simple_nav' => [
+      'base hook' => 'block',
+      'template' => 'block--lego-simple-nav',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_block().
+ *
+ * Preprocesses the parent Simple Nav block.
+ * Iterates through the multi-value `field_simple_nav_links`, extracts the
+ * absolute URL string and title for each item, and maps them into a flat,
+ * iterable array (`nav_items`) for the frontend SDC template to render
+ * as a list of links.
+ */
+function leap_lego_simple_nav_preprocess_block__block_content__simple_nav(array &$variables): void {
+  $content = $variables['content'];
+
+  // Ensure the block content entity is available.
+  if (!isset($content['#block_content'])) {
+    return;
+  }
+
+  /** @var \Drupal\block_content\Entity\BlockContent $block */
+  $block = $content['#block_content'];
+
+  $items = [];
+  // Verify the block has the expected multi-value link field.
+  if ($block->hasField('field_simple_nav_links')) {
+    foreach ($block->get('field_simple_nav_links') as $link_item) {
+      if (!$link_item->isEmpty()) {
+        $items[] = [
+          'url' => $link_item->getUrl()->toString() ?? '',
+          'title' => $link_item->title ?? '',
+        ];
+      }
+    }
+  }
+
+  // Inject the mapped array into the variables array for Twig.
+  $variables['nav_items'] = $items;
+}

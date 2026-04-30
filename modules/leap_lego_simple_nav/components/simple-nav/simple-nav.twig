@@ -1,0 +1,19 @@
+<div class="sf-lego-simple-nav">
+  {% if title %}
+    <h3 class="mb-4">{{ title }}</h3>
+  {% endif %}
+  
+  {% if body %}
+    <div class="mb-4">{{ body }}</div>
+  {% endif %}
+
+  {% if items %}
+    <ul class="nav flex-column">
+      {% for item in items %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ item.url }}">{{ item.title|default(item.url) }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>

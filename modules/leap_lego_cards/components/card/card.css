@@ -1,0 +1,12 @@
+/* 
+ * Apply Bootstrap's .card-img-top styling directly to whatever media element
+ * Drupal renders inside this wrapper. This ensures out-of-the-box styling
+ * regardless of the chosen image formatter or media type.
+ */
+.sf-card-media-wrapper img,
+.sf-card-media-wrapper video,
+.sf-card-media-wrapper picture {
+  width: 100%;
+  border-top-left-radius: var(--bs-card-inner-border-radius, calc(0.375rem - 1px));
+  border-top-right-radius: var(--bs-card-inner-border-radius, calc(0.375rem - 1px));
+}
