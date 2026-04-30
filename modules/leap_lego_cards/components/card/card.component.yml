@@ -1,0 +1,24 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/11.x/core/assets/schemas/v1/metadata.schema.json
+name: Card
+description: 'A Bootstrap 5.3 card component.'
+libraryOverrides:
+  css:
+    component:
+      card.css: {}
+props:
+  type: object
+  properties:
+    title:
+      type: [string, "null"]
+    body:
+      type: [string, "null"]
+    media:
+      type: [string, "null"]
+      description: 'Rendered media (image/video).'
+    link_url:
+      type: [string, "null"]
+    link_title:
+      type: [string, "null"]
+    link_wrap:
+      type: boolean
+      description: 'If true, the entire card is clickable.'

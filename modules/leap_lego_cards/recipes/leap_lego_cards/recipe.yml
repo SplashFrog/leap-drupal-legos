@@ -1,0 +1,12 @@
+name: 'Splash Frog Legos - Cards'
+description: 'Provides configuration for a content block to design cards using Layout Builder.'
+type: 'Site-Building'
+install:
+  - block_content
+  - media
+  - link
+  - linkit
+  - linkit_attributes
+  - text
+config:
+  strict: false

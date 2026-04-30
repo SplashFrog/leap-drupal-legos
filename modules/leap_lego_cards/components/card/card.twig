@@ -1,0 +1,30 @@
+<div class="card h-100 {{ link_wrap ? 'position-relative' : '' }}">
+  {% if media %}
+    <div class="sf-card-media-wrapper">
+      {{ media }}
+    </div>
+  {% endif %}
+  
+  <div class="card-body">
+    {% if title %}
+      <h5 class="card-title">{{ title }}</h5>
+    {% endif %}
+    
+    {% if body %}
+      <div class="card-text">{{ body }}</div>
+    {% endif %}
+    
+    {% if link_url %}
+      {# Use link_title if provided, otherwise fallback to the URL itself #}
+      {% set link_text = link_title|default(link_url) %}
+      
+      {# 
+        If link_wrap is true, we use Bootstrap's stretched-link class.
+        This makes the whole card clickable while maintaining accessibility.
+      #}
+      <a href="{{ link_url }}" class="btn btn-primary {{ link_wrap ? 'stretched-link' : '' }}">
+        {{ link_text }}
+      </a>
+    {% endif %}
+  </div>
+</div>

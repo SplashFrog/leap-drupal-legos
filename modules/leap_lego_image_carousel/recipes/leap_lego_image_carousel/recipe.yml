@@ -1,0 +1,14 @@
+name: 'Splash Frog Legos - Image Carousel'
+description: 'Provides configuration for a content block to design image carousels using Layout Builder.'
+type: 'Site-Building'
+install:
+  - block_content
+  - paragraphs
+  - media
+  - link
+  - linkit
+  - linkit_attributes
+  - text
+  - entity_reference_revisions
+config:
+  strict: false

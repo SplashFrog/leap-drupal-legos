@@ -1,16 +1,120 @@
 <?php
 
 /**
- * Implements HOOK_preprocess_paragraph__PARAGRAPH_TYPE().
+ * @file
  */
-function leap_lego_accordions_preprocess_paragraph__accordions(&$variables) {
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Hook implementations for the LEAP Lego - Accordions module.
+ *
+ * This module acts as the bridge between Drupal's backend data structures
+ * (Block Content and Paragraph entities) and the frontend Single Directory
+ * Component (SDC) templates. It handles preprocessing, theme hook suggestions,
+ * and data mapping.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ *
+ * Provides instructions to site builders on how to complete the installation
+ * of the Accordions Lego by applying the accompanying Drupal Recipe.
+ */
+function leap_lego_accordions_help(string $route_name, RouteMatchInterface $route_match): string {
+  if ($route_name === 'help.page.leap_lego_accordions') {
+    $module_path = \Drupal::service('extension.list.module')->getPath('leap_lego_accordions');
+    $command = "drush recipe $module_path/recipes/leap_lego_accordions";
+
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('This module provides the SDC component and bridging logic for the Accordions Lego. To fully configure the block types and fields, you must apply the associated recipe.') . '</p>';
+    $output .= '<h3>' . t('Installation Instructions') . '</h3>';
+    $output .= '<p>' . t('To install the pre-configured Accordions block type, you must run the following Drush command from your project root:') . '</p>';
+    $output .= '<pre><code>' . $command . '</code></pre>';
+    return $output;
+  }
+  return '';
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * Registers a specific theme hook suggestion to route the Accordions block
+ * content entity directly to our custom `block--lego-accordions.html.twig`
+ * template, where the SDC is embedded.
+ */
+function leap_lego_accordions_theme(array $existing, string $type, string $theme, string $path): array {
+  return [
+    'block__block_content__accordions' => [
+      'base hook' => 'block',
+      'template' => 'block--lego-accordions',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_paragraph__PARAGRAPH_TYPE().
+ *
+ * Preprocesses individual accordion paragraph items.
+ * Extracts the parent block's ID to ensure that HTML `id` attributes
+ * for Bootstrap 5 accordions (which rely on IDs for collapse logic)
+ * are globally unique, even if the same paragraph exists multiple times.
+ */
+function leap_lego_accordions_preprocess_paragraph__accordions(array &$variables): void {
+  /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
   $paragraph = $variables['paragraph'];
   $parent_entity = $paragraph->getParentEntity();
+
   if ($parent_entity) {
     $parentType = $parent_entity->getEntityTypeId();
-    if (in_array($parentType, ['block_content', 'inline_block'])) {
-      $id = $parent_entity->id();
-      $variables['parent_id'] = $id;
+    // Support both standard Block Content and Layout Builder Inline Blocks.
+    if (in_array($parentType, ['block_content', 'inline_block'], TRUE)) {
+      $variables['parent_id'] = $parent_entity->id();
     }
   }
+}
+
+/**
+ * Implements hook_preprocess_block().
+ *
+ * Preprocesses the parent Accordions block.
+ * Iterates through the referenced paragraph items, extracts their data,
+ * sanitizes the rich text, and maps everything into a clean array structure
+ * (`accordion_items`) that the frontend SDC template expects.
+ */
+function leap_lego_accordions_preprocess_block__block_content__accordions(array &$variables): void {
+  $content = $variables['content'];
+
+  // Ensure the block content entity is available.
+  if (!isset($content['#block_content'])) {
+    return;
+  }
+
+  /** @var \Drupal\block_content\Entity\BlockContent $block */
+  $block = $content['#block_content'];
+
+  // Generate a unique base ID for the entire accordion group.
+  $variables['accordion_id'] = 'accordion-' . $block->id();
+
+  $items = [];
+  // Verify the block has the expected entity reference field.
+  if ($block->hasField('field_accordions')) {
+    // Loop through each attached paragraph to build the data array.
+    foreach ($block->get('field_accordions')->referencedEntities() as $paragraph) {
+      /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
+      $items[] = [
+        // Combine the parent ID and paragraph ID to guarantee HTML DOM uniqueness.
+        'id' => $variables['accordion_id'] . '-' . $paragraph->id(),
+        'title' => $paragraph->get('field_title')->getString() ?? '',
+        // Sanitize the WYSIWYG body content before passing it to the SDC.
+        'content' => check_markup((string) $paragraph->get('field_body')->value, $paragraph->get('field_body')->format),
+      ];
+    }
+  }
+
+  // Inject the mapped array into the variables array for Twig.
+  $variables['accordion_items'] = $items;
 }

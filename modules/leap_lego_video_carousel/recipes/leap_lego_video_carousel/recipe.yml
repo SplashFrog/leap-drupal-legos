@@ -1,0 +1,9 @@
+name: 'Splash Frog Legos - Video Carousel'
+description: 'Provides configuration for a content block to design video carousels using Layout Builder.'
+type: 'Site-Building'
+install:
+  - block_content
+  - media
+  - text
+config:
+  strict: false

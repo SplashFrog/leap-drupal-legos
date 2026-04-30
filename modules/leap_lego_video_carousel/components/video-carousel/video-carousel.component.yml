@@ -1,0 +1,19 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/11.x/core/assets/schemas/v1/metadata.schema.json
+name: Video Carousel
+description: 'A Bootstrap 5.3 video carousel component.'
+props:
+  type: object
+  properties:
+    id:
+      type: string
+    title:
+      type: [string, "null"]
+    body:
+      type: [string, "null"]
+    items:
+      type: array
+      items:
+        type: object
+        properties:
+          media:
+            type: string

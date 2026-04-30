@@ -1,0 +1,26 @@
+{#
+/**
+ * @file
+ * Default module theme implementation for the sibling navigation block content type.
+ */
+#}
+{% set block_classes = [
+  'block',
+  'block-' ~ configuration.provider|clean_class,
+  'block-' ~ plugin_id|clean_class,
+  layout ? 'layout--' ~ layout|clean_class,
+] %}
+
+<div{{ attributes.addClass(block_classes) }}>
+  {{ title_prefix }}
+  {% if label %}
+    <h2{{ title_attributes }}>{{ label }}</h2>
+  {% endif %}
+  {{ title_suffix }}
+
+  {% include 'leap_lego_sibling_nav:sibling-nav' with {
+    'title': content.field_title[0]['#context']['value']|default(''),
+    'body': content.body[0]|default(''),
+    'nav_content': nav_content|default('')
+  } only %}
+</div>

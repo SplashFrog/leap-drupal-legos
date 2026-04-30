@@ -1,1 +1,101 @@
 <?php
+
+/**
+ * @file
+ */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Hook implementations for the LEAP Lego - Video Carousel module.
+ *
+ * This module acts as the bridge between Drupal's backend data structures
+ * (Block Content entities) and the frontend Single Directory Component (SDC)
+ * templates. Unlike the Image Carousel which uses paragraphs, this module
+ * extracts and renders referenced Media entities (Videos) directly.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ *
+ * Provides instructions to site builders on how to complete the installation
+ * of the Video Carousel Lego by applying the accompanying Drupal Recipe.
+ */
+function leap_lego_video_carousel_help(string $route_name, RouteMatchInterface $route_match): string {
+  if ($route_name === 'help.page.leap_lego_video_carousel') {
+    $module_path = \Drupal::service('extension.list.module')->getPath('leap_lego_video_carousel');
+    $command = "drush recipe $module_path/recipes/leap_lego_video_carousel";
+
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('This module provides the SDC component and bridging logic for the Video Carousel Lego. To fully configure the block types and fields, you must apply the associated recipe.') . '</p>';
+    $output .= '<h3>' . t('Installation Instructions') . '</h3>';
+    $output .= '<p>' . t('To install the pre-configured Video Carousel block type, you must run the following Drush command from your project root:') . '</p>';
+    $output .= '<pre><code>' . $command . '</code></pre>';
+    return $output;
+  }
+  return '';
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * Registers a specific theme hook suggestion to route the Video Carousel block
+ * content entity directly to our custom `block--lego-video-carousel.html.twig`
+ * template, where the Bootstrap 5 SDC is embedded.
+ */
+function leap_lego_video_carousel_theme(array $existing, string $type, string $theme, string $path): array {
+  return [
+    'block__block_content__video_carousel' => [
+      'base hook' => 'block',
+      'template' => 'block--lego-video-carousel',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_block().
+ *
+ * Preprocesses the parent Video Carousel block.
+ * Iterates through the directly referenced Media entities (Videos) and
+ * programmatically renders them using the entity view builder. This ensures
+ * that core oEmbed logic (for YouTube/Vimeo) or native HTML5 `<video>`
+ * tags are fully rendered before being passed to the SDC carousel slides.
+ */
+function leap_lego_video_carousel_preprocess_block__block_content__video_carousel(array &$variables): void {
+  $content = $variables['content'];
+
+  // Ensure the block content entity is available.
+  if (!isset($content['#block_content'])) {
+    return;
+  }
+
+  /** @var \Drupal\block_content\Entity\BlockContent $block */
+  $block = $content['#block_content'];
+
+  // Generate a unique base ID for the Bootstrap carousel controls.
+  $variables['carousel_id'] = 'carousel-' . $block->id();
+
+  $items = [];
+  // Verify the block has the expected entity reference field.
+  if ($block->hasField('field_videos')) {
+    $view_builder = \Drupal::entityTypeManager()->getViewBuilder('media');
+
+    // Loop directly over the media entities attached to the block.
+    // Unlike the Image Carousel, videos are usually just the player,
+    // so we skip the Paragraph wrapper and render the media directly.
+    foreach ($block->get('field_videos')->referencedEntities() as $media_entity) {
+      if ($media_entity) {
+        $build = $view_builder->view($media_entity, 'default');
+        $items[] = [
+          'media' => \Drupal::service('renderer')->render($build),
+        ];
+      }
+    }
+  }
+
+  // Inject the mapped array into the variables array for Twig.
+  $variables['carousel_items'] = $items;
+}

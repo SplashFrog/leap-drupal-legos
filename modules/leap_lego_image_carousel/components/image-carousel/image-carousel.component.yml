@@ -1,0 +1,25 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/11.x/core/assets/schemas/v1/metadata.schema.json
+name: Image Carousel
+description: 'A Bootstrap 5.3 image carousel component.'
+props:
+  type: object
+  properties:
+    id:
+      type: string
+    title:
+      type: [string, "null"]
+    body:
+      type: [string, "null"]
+    items:
+      type: array
+      items:
+        type: object
+        properties:
+          media:
+            type: [string, "null"]
+          title:
+            type: [string, "null"]
+          link_url:
+            type: [string, "null"]
+          link_title:
+            type: [string, "null"]

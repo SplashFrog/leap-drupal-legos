@@ -1,0 +1,50 @@
+<div class="sf-lego-carousel">
+  {% if title %}
+    <h3 class="mb-4">{{ title }}</h3>
+  {% endif %}
+  
+  {% if body %}
+    <div class="mb-4">{{ body }}</div>
+  {% endif %}
+
+  <div id="{{ id }}" class="carousel slide" data-bs-ride="carousel">
+    {# Indicators #}
+    <div class="carousel-indicators">
+      {% for item in items %}
+        <button type="button" data-bs-target="#{{ id }}" data-bs-slide-to="{{ loop.index0 }}" class="{{ loop.first ? 'active' : '' }}" aria-current="{{ loop.first ? 'true' : 'false' }}" aria-label="Slide {{ loop.index }}"></button>
+      {% endfor %}
+    </div>
+
+    {# Slides #}
+    <div class="carousel-inner">
+      {% for item in items %}
+        <div class="carousel-item {{ loop.first ? 'active' : '' }}">
+          {{ item.media }}
+          
+          {% if item.title or item.link_url %}
+            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
+              {% if item.title %}
+                <h5>{{ item.title }}</h5>
+              {% endif %}
+              {% if item.link_url %}
+                <a href="{{ item.link_url }}" class="btn btn-primary mt-2">
+                  {{ item.link_title|default('Learn More') }}
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    {# Controls #}
+    <button class="carousel-control-prev" type="button" data-bs-target="#{{ id }}" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#{{ id }}" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,11 @@
+name: 'Splash Frog Legos - Simple Navigation'
+description: 'Provides configuration for a content block to design simple navigation menus using Layout Builder.'
+type: 'Site-Building'
+install:
+  - block_content
+  - link
+  - linkit
+  - linkit_attributes
+  - text
+config:
+  strict: false

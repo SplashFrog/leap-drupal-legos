@@ -1,8 +1,8 @@
 name: 'Splash Frog Legos - Accordions'
-core_version_requirement: ^10.4 || ^11
+core_version_requirement: ^11.3
 type: module
-version: '1.0.0'
-description: 'Provides configuration for content block for Layout Builder to design accordions.'
+version: '2.0.0'
+description: 'Provides the Single Directory Component (SDC) and bridging logic for the Accordions Lego. Apply the associated recipe to install the block configuration.'
 package: 'Splash Frog'
 dependencies:
   - drupal:block_content

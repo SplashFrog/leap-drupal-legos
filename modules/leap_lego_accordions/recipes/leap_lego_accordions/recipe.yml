@@ -1,0 +1,10 @@
+name: 'Splash Frog Legos - Accordions'
+description: 'Provides configuration for a content block to design accordions using Layout Builder.'
+type: 'Site-Building'
+install:
+  - block_content
+  - paragraphs
+  - text
+  - entity_reference_revisions
+config:
+  strict: false
