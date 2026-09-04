@@ -21,7 +21,6 @@ default_value:
     display_id: lego_sibling_nav
     arguments: '[block_content:field_parent_content:target_id]'
     items_to_display: ''
-    token_help: ''
 default_value_callback: ''
 settings:
   force_default: true
