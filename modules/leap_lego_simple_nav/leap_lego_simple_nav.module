@@ -49,7 +49,7 @@ function leap_lego_simple_nav_help(string $route_name, RouteMatchInterface $rout
  */
 function leap_lego_simple_nav_theme(array $existing, string $type, string $theme, string $path): array {
   return [
-    'block__block_content__simple_nav' => [
+    'block__block_content__type__simple_nav' => [
       'base hook' => 'block',
       'template' => 'block--lego-simple-nav',
     ],
@@ -65,7 +65,7 @@ function leap_lego_simple_nav_theme(array $existing, string $type, string $theme
  * iterable array (`nav_items`) for the frontend SDC template to render
  * as a list of links.
  */
-function leap_lego_simple_nav_preprocess_block__block_content__simple_nav(array &$variables): void {
+function leap_lego_simple_nav_preprocess_block(array &$variables): void {
   $content = $variables['content'];
 
   // Ensure the block content entity is available.
@@ -76,19 +76,21 @@ function leap_lego_simple_nav_preprocess_block__block_content__simple_nav(array 
   /** @var \Drupal\block_content\Entity\BlockContent $block */
   $block = $content['#block_content'];
 
-  $items = [];
-  // Verify the block has the expected multi-value link field.
-  if ($block->hasField('field_simple_nav_links')) {
-    foreach ($block->get('field_simple_nav_links') as $link_item) {
-      if (!$link_item->isEmpty()) {
-        $items[] = [
-          'url' => $link_item->getUrl()->toString() ?? '',
-          'title' => $link_item->title ?? '',
-        ];
-      }
-    }
-  }
+	if ($block->bundle() === 'simple_nav') {
+		$items = [];
+		// Verify the block has the expected multi-value link field.
+		if ($block->hasField('field_simple_nav_links')) {
+			foreach ($block->get('field_simple_nav_links') as $link_item) {
+				if (!$link_item->isEmpty()) {
+					$items[] = [
+						'url' => $link_item->getUrl()->toString() ?? '',
+						'title' => $link_item->title ?? '',
+					];
+				}
+			}
+		}
 
-  // Inject the mapped array into the variables array for Twig.
-  $variables['nav_items'] = $items;
+		// Inject the mapped array into the variables array for Twig.
+		$variables['nav_items'] = $items;
+	}
 }

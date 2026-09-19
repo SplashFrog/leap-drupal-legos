@@ -51,7 +51,7 @@ function leap_lego_sibling_nav_help(string $route_name, RouteMatchInterface $rou
  */
 function leap_lego_sibling_nav_theme(array $existing, string $type, string $theme, string $path): array {
   return [
-    'block__block_content__sibling_nav' => [
+    'block__block_content__type__sibling_nav' => [
       'base hook' => 'block',
       'template' => 'block--lego-sibling-nav',
     ],
@@ -65,7 +65,7 @@ function leap_lego_sibling_nav_theme(array $existing, string $type, string $them
  * Programmatically renders the embedded View block and passes the resulting
  * HTML markup directly into the SDC component wrapper.
  */
-function leap_lego_sibling_nav_preprocess_block__block_content__sibling_nav(array &$variables): void {
+function leap_lego_sibling_nav_preprocess_block(array &$variables): void {
   $content = $variables['content'];
 
   // Ensure the block content entity is available.
@@ -75,17 +75,18 @@ function leap_lego_sibling_nav_preprocess_block__block_content__sibling_nav(arra
 
   /** @var \Drupal\block_content\Entity\BlockContent $block */
   $block = $content['#block_content'];
+	if ($block->bundle() === 'sibling_nav') {
+		$nav_content = '';
+		// Check if the block has the embedded view field.
+		if ($block->hasField('field_sibling_nav') && !$block->get('field_sibling_nav')->isEmpty()) {
+			$view_builder = \Drupal::entityTypeManager()->getViewBuilder('block_content');
+			$field_render = $view_builder->viewField($block->get('field_sibling_nav'), 'default');
+			$nav_content = \Drupal::service('renderer')->render($field_render) ?? '';
+		}
 
-  $nav_content = '';
-  // Check if the block has the embedded view field.
-  if ($block->hasField('field_sibling_nav') && !$block->get('field_sibling_nav')->isEmpty()) {
-    $view_builder = \Drupal::entityTypeManager()->getViewBuilder('block_content');
-    $field_render = $view_builder->viewField($block->get('field_sibling_nav'), 'default');
-    $nav_content = \Drupal::service('renderer')->render($field_render) ?? '';
-  }
-
-  // Inject the rendered view HTML into the variables array for Twig.
-  $variables['nav_content'] = $nav_content;
+		// Inject the rendered view HTML into the variables array for Twig.
+		$variables['nav_content'] = $nav_content;
+	}
 }
 
 /**

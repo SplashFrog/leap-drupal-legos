@@ -48,7 +48,7 @@ function leap_lego_cards_help(string $route_name, RouteMatchInterface $route_mat
  */
 function leap_lego_cards_theme(array $existing, string $type, string $theme, string $path): array {
   return [
-    'block__block_content__cards' => [
+    'block__block_content__type__cards' => [
       'base hook' => 'block',
       'template' => 'block--lego-cards',
     ],
@@ -63,7 +63,7 @@ function leap_lego_cards_theme(array $existing, string $type, string $theme, str
  * card should act as a clickable link) and injects them as simple scalar
  * variables for the SDC template to consume safely.
  */
-function leap_lego_cards_preprocess_block__block_content__cards(array &$variables): void {
+function leap_lego_cards_preprocess_block(array &$variables): void {
   $content = $variables['content'];
 
   // Ensure the block content entity is available.
@@ -73,24 +73,25 @@ function leap_lego_cards_preprocess_block__block_content__cards(array &$variable
 
   /** @var \Drupal\block_content\Entity\BlockContent $block */
   $block = $content['#block_content'];
+	if ($block->bundle() === 'cards') {
+		// Initialize default variable states for the Twig template.
+		$variables['card_link_url'] = '';
+		$variables['card_link_title'] = '';
+		$variables['card_link_wrap'] = FALSE;
 
-  // Initialize default variable states for the Twig template.
-  $variables['card_link_url'] = '';
-  $variables['card_link_title'] = '';
-  $variables['card_link_wrap'] = FALSE;
+		// Process the Link Field.
+		// Extract the generated absolute URL string and the link title.
+		if ($block->hasField('field_link') && !$block->get('field_link')->isEmpty()) {
+			$link_item = $block->get('field_link')->first();
+			$variables['card_link_url'] = $link_item->getUrl()->toString() ?? '';
+			$variables['card_link_title'] = $link_item->title ?? '';
+		}
 
-  // Process the Link Field.
-  // Extract the generated absolute URL string and the link title.
-  if ($block->hasField('field_link') && !$block->get('field_link')->isEmpty()) {
-    $link_item = $block->get('field_link')->first();
-    $variables['card_link_url'] = $link_item->getUrl()->toString() ?? '';
-    $variables['card_link_title'] = $link_item->title ?? '';
-  }
-
-  // Process the Link Wrap Toggle.
-  // This boolean determines if the SDC should wrap the entire card DOM
-  // inside an anchor tag, or just render a standalone button.
-  if ($block->hasField('field_card_link_wrap')) {
-    $variables['card_link_wrap'] = (bool) $block->get('field_card_link_wrap')->value;
-  }
+		// Process the Link Wrap Toggle.
+		// This boolean determines if the SDC should wrap the entire card DOM
+		// inside an anchor tag, or just render a standalone button.
+		if ($block->hasField('field_card_link_wrap')) {
+			$variables['card_link_wrap'] = (bool) $block->get('field_card_link_wrap')->value;
+		}
+	}
 }

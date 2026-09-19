@@ -48,7 +48,7 @@ function leap_lego_video_carousel_help(string $route_name, RouteMatchInterface $
  */
 function leap_lego_video_carousel_theme(array $existing, string $type, string $theme, string $path): array {
   return [
-    'block__block_content__video_carousel' => [
+    'block__block_content__type__video_carousel' => [
       'base hook' => 'block',
       'template' => 'block--lego-video-carousel',
     ],
@@ -64,7 +64,7 @@ function leap_lego_video_carousel_theme(array $existing, string $type, string $t
  * that core oEmbed logic (for YouTube/Vimeo) or native HTML5 `<video>`
  * tags are fully rendered before being passed to the SDC carousel slides.
  */
-function leap_lego_video_carousel_preprocess_block__block_content__video_carousel(array &$variables): void {
+function leap_lego_video_carousel_preprocess_block(array &$variables): void {
   $content = $variables['content'];
 
   // Ensure the block content entity is available.
@@ -74,28 +74,29 @@ function leap_lego_video_carousel_preprocess_block__block_content__video_carouse
 
   /** @var \Drupal\block_content\Entity\BlockContent $block */
   $block = $content['#block_content'];
+	if ($block->bundle() === 'video_carousel') {
+		// Generate a unique base ID for the Bootstrap carousel controls.
+		$variables['carousel_id'] = 'carousel-' . $block->id();
 
-  // Generate a unique base ID for the Bootstrap carousel controls.
-  $variables['carousel_id'] = 'carousel-' . $block->id();
+		$items = [];
+		// Verify the block has the expected entity reference field.
+		if ($block->hasField('field_videos')) {
+			$view_builder = \Drupal::entityTypeManager()->getViewBuilder('media');
 
-  $items = [];
-  // Verify the block has the expected entity reference field.
-  if ($block->hasField('field_videos')) {
-    $view_builder = \Drupal::entityTypeManager()->getViewBuilder('media');
+			// Loop directly over the media entities attached to the block.
+			// Unlike the Image Carousel, videos are usually just the player,
+			// so we skip the Paragraph wrapper and render the media directly.
+			foreach ($block->get('field_videos')->referencedEntities() as $media_entity) {
+				if ($media_entity) {
+					$build = $view_builder->view($media_entity, 'default');
+					$items[] = [
+						'media' => \Drupal::service('renderer')->render($build),
+					];
+				}
+			}
+		}
 
-    // Loop directly over the media entities attached to the block.
-    // Unlike the Image Carousel, videos are usually just the player,
-    // so we skip the Paragraph wrapper and render the media directly.
-    foreach ($block->get('field_videos')->referencedEntities() as $media_entity) {
-      if ($media_entity) {
-        $build = $view_builder->view($media_entity, 'default');
-        $items[] = [
-          'media' => \Drupal::service('renderer')->render($build),
-        ];
-      }
-    }
-  }
-
-  // Inject the mapped array into the variables array for Twig.
-  $variables['carousel_items'] = $items;
+		// Inject the mapped array into the variables array for Twig.
+		$variables['carousel_items'] = $items;
+	}
 }

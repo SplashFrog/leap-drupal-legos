@@ -48,7 +48,7 @@ function leap_lego_tabs_help(string $route_name, RouteMatchInterface $route_matc
  */
 function leap_lego_tabs_theme(array $existing, string $type, string $theme, string $path): array {
   return [
-    'block__block_content__tabs' => [
+    'block__block_content__type__tabs' => [
       'base hook' => 'block',
       'template' => 'block--lego-tabs',
     ],
@@ -86,7 +86,7 @@ function leap_lego_tabs_preprocess_paragraph__tabs(array &$variables): void {
  * (`tabs_items`) that the frontend SDC template expects for rendering both
  * the tab navigation links and the tab content panes.
  */
-function leap_lego_tabs_preprocess_block__block_content__tabs(array &$variables): void {
+function leap_lego_tabs_preprocess_block(array &$variables): void {
   $content = $variables['content'];
 
   // Ensure the block content entity is available.
@@ -96,26 +96,27 @@ function leap_lego_tabs_preprocess_block__block_content__tabs(array &$variables)
 
   /** @var \Drupal\block_content\Entity\BlockContent $block */
   $block = $content['#block_content'];
+	if ($block->bundle() === 'tabs') {
+		// Generate a unique base ID for the entire tab group.
+		$variables['tabs_id'] = 'tabs-' . $block->id();
 
-  // Generate a unique base ID for the entire tab group.
-  $variables['tabs_id'] = 'tabs-' . $block->id();
+		$items = [];
+		// Verify the block has the expected entity reference field.
+		if ($block->hasField('field_tabs')) {
+			// Loop through each attached paragraph to build the data array.
+			foreach ($block->get('field_tabs')->referencedEntities() as $paragraph) {
+				/** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
+				$items[] = [
+					// Combine the parent ID and paragraph ID to guarantee HTML DOM uniqueness.
+					'id' => $variables['tabs_id'] . '-' . $paragraph->id(),
+					'title' => $paragraph->get('field_title')->getString() ?? '',
+					// Sanitize the WYSIWYG body content before passing it to the SDC.
+					'content' => check_markup((string) $paragraph->get('field_body')->value, $paragraph->get('field_body')->format),
+				];
+			}
+		}
 
-  $items = [];
-  // Verify the block has the expected entity reference field.
-  if ($block->hasField('field_tabs')) {
-    // Loop through each attached paragraph to build the data array.
-    foreach ($block->get('field_tabs')->referencedEntities() as $paragraph) {
-      /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
-      $items[] = [
-        // Combine the parent ID and paragraph ID to guarantee HTML DOM uniqueness.
-        'id' => $variables['tabs_id'] . '-' . $paragraph->id(),
-        'title' => $paragraph->get('field_title')->getString() ?? '',
-        // Sanitize the WYSIWYG body content before passing it to the SDC.
-        'content' => check_markup((string) $paragraph->get('field_body')->value, $paragraph->get('field_body')->format),
-      ];
-    }
-  }
-
-  // Inject the mapped array into the variables array for Twig.
-  $variables['tabs_items'] = $items;
+		// Inject the mapped array into the variables array for Twig.
+		$variables['tabs_items'] = $items;
+	}
 }
