@@ -48,7 +48,7 @@ function leap_lego_accordions_help(string $route_name, RouteMatchInterface $rout
  */
 function leap_lego_accordions_theme(array $existing, string $type, string $theme, string $path): array {
   return [
-    'block__block_content__accordions' => [
+    'block__block_content__type__accordions' => [
       'base hook' => 'block',
       'template' => 'block--lego-accordions',
     ],
@@ -85,7 +85,7 @@ function leap_lego_accordions_preprocess_paragraph__accordions(array &$variables
  * sanitizes the rich text, and maps everything into a clean array structure
  * (`accordion_items`) that the frontend SDC template expects.
  */
-function leap_lego_accordions_preprocess_block__block_content__accordions(array &$variables): void {
+function leap_lego_accordions_preprocess_block(array &$variables): void {
   $content = $variables['content'];
 
   // Ensure the block content entity is available.
@@ -95,26 +95,27 @@ function leap_lego_accordions_preprocess_block__block_content__accordions(array 
 
   /** @var \Drupal\block_content\Entity\BlockContent $block */
   $block = $content['#block_content'];
+	if ($block->bundle() === 'accordions') {
+		// Generate a unique base ID for the entire accordion group.
+		$variables['accordion_id'] = 'accordion-' . $block->id();
 
-  // Generate a unique base ID for the entire accordion group.
-  $variables['accordion_id'] = 'accordion-' . $block->id();
+		$items = [];
+		// Verify the block has the expected entity reference field.
+		if ($block->hasField('field_accordions')) {
+			// Loop through each attached paragraph to build the data array.
+			foreach ($block->get('field_accordions')->referencedEntities() as $paragraph) {
+				/** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
+				$items[] = [
+					// Combine the parent ID and paragraph ID to guarantee HTML DOM uniqueness.
+					'id' => $variables['accordion_id'] . '-' . $paragraph->id(),
+					'title' => $paragraph->get('field_title')->getString() ?? '',
+					// Sanitize the WYSIWYG body content before passing it to the SDC.
+					'content' => check_markup((string) $paragraph->get('field_body')->value, $paragraph->get('field_body')->format),
+				];
+			}
+		}
 
-  $items = [];
-  // Verify the block has the expected entity reference field.
-  if ($block->hasField('field_accordions')) {
-    // Loop through each attached paragraph to build the data array.
-    foreach ($block->get('field_accordions')->referencedEntities() as $paragraph) {
-      /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
-      $items[] = [
-        // Combine the parent ID and paragraph ID to guarantee HTML DOM uniqueness.
-        'id' => $variables['accordion_id'] . '-' . $paragraph->id(),
-        'title' => $paragraph->get('field_title')->getString() ?? '',
-        // Sanitize the WYSIWYG body content before passing it to the SDC.
-        'content' => check_markup((string) $paragraph->get('field_body')->value, $paragraph->get('field_body')->format),
-      ];
-    }
-  }
-
-  // Inject the mapped array into the variables array for Twig.
-  $variables['accordion_items'] = $items;
+		// Inject the mapped array into the variables array for Twig.
+		$variables['accordion_items'] = $items;
+	}
 }

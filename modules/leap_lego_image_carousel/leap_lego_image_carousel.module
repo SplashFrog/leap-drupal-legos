@@ -48,7 +48,7 @@ function leap_lego_image_carousel_help(string $route_name, RouteMatchInterface $
  */
 function leap_lego_image_carousel_theme(array $existing, string $type, string $theme, string $path): array {
   return [
-    'block__block_content__image_carousel' => [
+    'block__block_content__type__image_carousel' => [
       'base hook' => 'block',
       'template' => 'block--lego-image-carousel',
     ],
@@ -64,7 +64,7 @@ function leap_lego_image_carousel_theme(array $existing, string $type, string $t
  * view builder. This ensures that responsive image styles and attributes are
  * fully calculated before being passed to the SDC.
  */
-function leap_lego_image_carousel_preprocess_block__block_content__image_carousel(array &$variables): void {
+function leap_lego_image_carousel_preprocess_block(array &$variables): void {
   $content = $variables['content'];
 
   // Ensure the block content entity is available.
@@ -74,48 +74,49 @@ function leap_lego_image_carousel_preprocess_block__block_content__image_carouse
 
   /** @var \Drupal\block_content\Entity\BlockContent $block */
   $block = $content['#block_content'];
+	if ($block->bundle() === 'image_carousel') {
+		// Generate a unique base ID for the Bootstrap carousel controls.
+		$variables['carousel_id'] = 'carousel-' . $block->id();
 
-  // Generate a unique base ID for the Bootstrap carousel controls.
-  $variables['carousel_id'] = 'carousel-' . $block->id();
+		$items = [];
+		// Verify the block has the expected entity reference field.
+		if ($block->hasField('field_carousel_images')) {
+			$paragraph_items = $block->get('field_carousel_images')->referencedEntities();
 
-  $items = [];
-  // Verify the block has the expected entity reference field.
-  if ($block->hasField('field_carousel_images')) {
-    $paragraph_items = $block->get('field_carousel_images')->referencedEntities();
+			// Loop through each attached paragraph slide.
+			foreach ($paragraph_items as $delta => $paragraph) {
+				/** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
+				$item = [
+					'media' => '',
+					'title' => ($paragraph->hasField('field_title') ? $paragraph->get('field_title')->value : '') ?? '',
+					'link_url' => '',
+					'link_title' => '',
+				];
 
-    // Loop through each attached paragraph slide.
-    foreach ($paragraph_items as $delta => $paragraph) {
-      /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
-      $item = [
-        'media' => '',
-        'title' => ($paragraph->hasField('field_title') ? $paragraph->get('field_title')->value : '') ?? '',
-        'link_url' => '',
-        'link_title' => '',
-      ];
+				// Process Media Field.
+				// We use the View Builder to render the media entity so that it utilizes
+				// the configured view mode (e.g., handling responsive image styles properly).
+				if ($paragraph->hasField('field_image') && !$paragraph->get('field_image')->isEmpty()) {
+					$view_builder = \Drupal::entityTypeManager()->getViewBuilder('media');
+					$media_entity = $paragraph->get('field_image')->entity;
+					if ($media_entity) {
+						$build = $view_builder->view($media_entity, 'default');
+						$item['media'] = \Drupal::service('renderer')->render($build);
+					}
+				}
 
-      // Process Media Field.
-      // We use the View Builder to render the media entity so that it utilizes
-      // the configured view mode (e.g., handling responsive image styles properly).
-      if ($paragraph->hasField('field_image') && !$paragraph->get('field_image')->isEmpty()) {
-        $view_builder = \Drupal::entityTypeManager()->getViewBuilder('media');
-        $media_entity = $paragraph->get('field_image')->entity;
-        if ($media_entity) {
-          $build = $view_builder->view($media_entity, 'default');
-          $item['media'] = \Drupal::service('renderer')->render($build);
-        }
-      }
+				// Process Link Field.
+				if ($paragraph->hasField('field_link') && !$paragraph->get('field_link')->isEmpty()) {
+					$link_item = $paragraph->get('field_link')->first();
+					$item['link_url'] = $link_item->getUrl()->toString() ?? '';
+					$item['link_title'] = $link_item->title ?? '';
+				}
 
-      // Process Link Field.
-      if ($paragraph->hasField('field_link') && !$paragraph->get('field_link')->isEmpty()) {
-        $link_item = $paragraph->get('field_link')->first();
-        $item['link_url'] = $link_item->getUrl()->toString() ?? '';
-        $item['link_title'] = $link_item->title ?? '';
-      }
+				$items[] = $item;
+			}
+		}
 
-      $items[] = $item;
-    }
-  }
-
-  // Inject the mapped array into the variables array for Twig.
-  $variables['carousel_items'] = $items;
+		// Inject the mapped array into the variables array for Twig.
+		$variables['carousel_items'] = $items;
+	}
 }
