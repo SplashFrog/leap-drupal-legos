@@ -1,9 +1,44 @@
 name: 'Splash Frog Legos - Video Carousel'
-description: 'Provides configuration for a content block to design video carousels using Layout Builder.'
+description: 'Provides configuration for a content block to design video carousels using Layout Builder, with optional per-video summary, duration, date and alternative title. Requires the Splash Frog media types (leap_media) recipe first. Videos play inline; apply the leap_lego_video_carousel_lightbox recipe to open them in a lightbox instead.'
 type: 'Site-Building'
 install:
   - block_content
+  - datetime
+  - leap_lego_video_carousel
   - media
   - text
 config:
-  strict: false
+  strict:
+    - field.storage.media.field_video_summary
+    - field.storage.media.field_video_duration
+    - field.storage.media.field_video_date
+    - field.storage.media.field_video_display_title
+  actions:
+    core.entity_form_display.media.remote_video.default:
+      setProperties: &video_form_components
+        content.field_video_summary:
+          type: string_textfield
+          weight: 20
+          region: content
+          settings: { size: 60, placeholder: '' }
+          third_party_settings: {  }
+        content.field_video_duration:
+          type: leap_video_duration_textfield
+          weight: 21
+          region: content
+          settings: { size: 8, placeholder: '33:52' }
+          third_party_settings: {  }
+        content.field_video_date:
+          type: datetime_default
+          weight: 22
+          region: content
+          settings: {  }
+          third_party_settings: {  }
+        content.field_video_display_title:
+          type: string_textfield
+          weight: 23
+          region: content
+          settings: { size: 60, placeholder: '' }
+          third_party_settings: {  }
+    core.entity_form_display.media.video.default:
+      setProperties: *video_form_components

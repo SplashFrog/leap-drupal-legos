@@ -1,0 +1,40 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.carousel
+    - field.field.media.remote_video.field_remote_video
+    - field.field.media.remote_video.field_video_date
+    - field.field.media.remote_video.field_video_display_title
+    - field.field.media.remote_video.field_video_duration
+    - field.field.media.remote_video.field_video_summary
+    - media.type.remote_video
+  module:
+    - media
+id: media.remote_video.carousel
+targetEntityType: media
+bundle: remote_video
+mode: carousel
+content:
+  field_remote_video:
+    type: oembed
+    label: hidden
+    settings:
+      max_width: 0
+      max_height: 0
+      loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  created: true
+  field_video_date: true
+  field_video_display_title: true
+  field_video_duration: true
+  field_video_summary: true
+  langcode: true
+  name: true
+  search_api_excerpt: true
+  thumbnail: true
+  uid: true

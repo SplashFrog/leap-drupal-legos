@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_video_summary
+    - media.type.video
+id: media.video.field_video_summary
+field_name: field_video_summary
+entity_type: media
+bundle: video
+label: Summary
+description: 'One line saying why this video is worth watching. Shown on the detailed card.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

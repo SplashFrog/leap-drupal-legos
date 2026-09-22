@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+id: media.carousel_detailed
+label: 'Carousel (detailed)'
+description: ''
+targetEntityType: media
+cache: true

@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_video_duration
+    - media.type.remote_video
+id: media.remote_video.field_video_duration
+field_name: field_video_duration
+entity_type: media
+bundle: remote_video
+label: Duration
+description: 'The running time as a player shows it, for example 33:52.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: leap_video_duration
