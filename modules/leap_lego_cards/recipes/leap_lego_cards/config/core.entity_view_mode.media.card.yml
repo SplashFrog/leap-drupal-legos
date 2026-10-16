@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+id: media.card
+label: Card
+description: 'Media rendered inside a Cards Lego block.'
+targetEntityType: media
+cache: true

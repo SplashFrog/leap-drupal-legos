@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: leap_card
+label: 'Card (16:9)'
+effects:
+  3c1e7a52-8d4f-4b19-a6e2-5f0b9d2c7e81:
+    uuid: 3c1e7a52-8d4f-4b19-a6e2-5f0b9d2c7e81
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 400
+      height: 225
+      anchor: center-center

@@ -24,7 +24,7 @@ function leap_lego_cards_install(): void {
   $module_path = \Drupal::service('extension.list.module')->getPath('leap_lego_cards');
   $command = "drush recipe $module_path/recipes/leap_lego_cards";
 
-  \Drupal::messenger()->addWarning(t('The Splash Frog Legos - Cards module has been enabled. <strong>To complete the setup, you must apply the associated recipe:</strong><br><br><code>@command</code>', [
+  \Drupal::messenger()->addWarning(t('The Splash Frog Legos - Cards module has been enabled. <strong>To complete the setup, apply the Splash Frog media types (leap_media) recipe if you have not already, then apply the associated recipe:</strong><br><br><code>@command</code>', [
     '@command' => $command,
   ]));
 }
