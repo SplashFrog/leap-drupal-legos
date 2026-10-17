@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: leap_carousel_image
+label: 'Carousel image (16:9)'
+effects:
+  6f4a9c2e-3b7d-4e18-a5c1-9d2e7f0b4a63:
+    uuid: 6f4a9c2e-3b7d-4e18-a5c1-9d2e7f0b4a63
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 840
+      height: 472
+      anchor: center-center

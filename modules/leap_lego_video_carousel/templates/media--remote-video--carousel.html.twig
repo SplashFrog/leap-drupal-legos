@@ -1,0 +1,26 @@
+{#
+/**
+ * @file
+ * Default simple card for a video in the Video Carousel: the media alone.
+ *
+ * A div, not the <article> of media.html.twig: a carousel slide is not a
+ * self-contained composition. A theme overrides this file by name.
+ *
+ * Available variables:
+ * - media: The media entity.
+ * - content: The rendered display.
+ * - view_mode: The view mode.
+ */
+#}
+{%
+  set classes = [
+    'media',
+    'media--type-' ~ media.bundle()|clean_class,
+    not media.isPublished() ? 'media--unpublished',
+    view_mode ? 'media--view-mode-' ~ view_mode|clean_class,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {{ title_suffix.contextual_links }}
+  {{ content }}
+</div>

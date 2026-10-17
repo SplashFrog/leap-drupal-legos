@@ -94,13 +94,13 @@ function leap_lego_image_carousel_preprocess_block(array &$variables): void {
 				];
 
 				// Process Media Field.
-				// We use the View Builder to render the media entity so that it utilizes
-				// the configured view mode (e.g., handling responsive image styles properly).
+				// Rendered in the 'carousel' view mode; a media bundle without a
+				// carousel display falls back to its default display.
 				if ($paragraph->hasField('field_image') && !$paragraph->get('field_image')->isEmpty()) {
 					$view_builder = \Drupal::entityTypeManager()->getViewBuilder('media');
 					$media_entity = $paragraph->get('field_image')->entity;
 					if ($media_entity) {
-						$build = $view_builder->view($media_entity, 'default');
+						$build = $view_builder->view($media_entity, 'carousel');
 						$item['media'] = \Drupal::service('renderer')->render($build);
 					}
 				}

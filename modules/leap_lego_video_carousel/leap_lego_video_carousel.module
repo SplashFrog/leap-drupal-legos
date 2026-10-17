@@ -52,7 +52,84 @@ function leap_lego_video_carousel_theme(array $existing, string $type, string $t
       'base hook' => 'block',
       'template' => 'block--lego-video-carousel',
     ],
+    'leap_video_duration' => [
+      'variables' => ['display' => NULL, 'spoken' => NULL, 'iso' => NULL],
+      'template' => 'leap-video-duration',
+    ],
+    'media__remote_video__carousel' => ['base hook' => 'media', 'template' => 'media--remote-video--carousel'],
+    'media__remote_video__carousel_detailed' => ['base hook' => 'media', 'template' => 'media--remote-video--carousel-detailed'],
+    'media__video__carousel' => ['base hook' => 'media', 'template' => 'media--video--carousel'],
+    'media__video__carousel_detailed' => ['base hook' => 'media', 'template' => 'media--video--carousel-detailed'],
   ];
+}
+
+/**
+ * Implements hook_preprocess_media().
+ *
+ * Supplies the detailed card's computed text; the fields it prints come from
+ * the display.
+ */
+function leap_lego_video_carousel_preprocess_media(array &$variables): void {
+  if (($variables['view_mode'] ?? '') !== 'carousel_detailed') {
+    return;
+  }
+  $media = $variables['media'] ?? NULL;
+  if (!$media instanceof \Drupal\media\MediaInterface) {
+    return;
+  }
+  $variables['video_title'] = \Drupal\leap_lego_video_carousel\VideoMetadata::title($media);
+  $variables['video_provider'] = \Drupal\leap_lego_video_carousel\VideoMetadata::providerName($media);
+}
+
+/**
+ * Implements hook_preprocess_glightbox_media_remote_video_formatter().
+ *
+ * For the lightbox opt-in: names the poster link. Never fires without
+ * glightbox_media_video. Runs after the formatter's own preprocess, which sets
+ * the title tooltip and data-glightbox string this replaces.
+ */
+function leap_lego_video_carousel_preprocess_glightbox_media_remote_video_formatter(array &$variables): void {
+  _leap_lego_video_carousel_name_poster_link($variables);
+}
+
+/**
+ * Implements hook_preprocess_glightbox_media_file_video_formatter().
+ */
+function leap_lego_video_carousel_preprocess_glightbox_media_file_video_formatter(array &$variables): void {
+  _leap_lego_video_carousel_name_poster_link($variables);
+}
+
+/**
+ * Sets the accessible name and lightbox caption on a GLightbox poster link.
+ */
+function _leap_lego_video_carousel_name_poster_link(array &$variables): void {
+  $media = $variables['entity'] ?? NULL;
+  if (!$media instanceof \Drupal\media\MediaInterface) {
+    return;
+  }
+  $title = \Drupal\leap_lego_video_carousel\VideoMetadata::title($media);
+  if ($title === '') {
+    return;
+  }
+  unset($variables['attributes']['title'], $variables['attributes']['data-glightbox']);
+  $attributes = \Drupal\leap_lego_video_carousel\VideoMetadata::linkAttributes(
+    $title,
+    \Drupal\leap_lego_video_carousel\VideoMetadata::summary($media),
+    \Drupal\leap_lego_video_carousel\VideoMetadata::duration($media),
+  );
+  foreach ($attributes as $name => $value) {
+    $variables['attributes'][$name] = $value;
+  }
+}
+
+/**
+ * Chooses the media view mode for a block view mode.
+ *
+ * Layout Builder's inline block form defaults to `full`, so only an explicit
+ * `detailed` selects the detailed card.
+ */
+function leap_lego_video_carousel_media_view_mode(string $block_view_mode): string {
+  return $block_view_mode === 'detailed' ? 'carousel_detailed' : 'carousel';
 }
 
 /**
@@ -86,13 +163,15 @@ function leap_lego_video_carousel_preprocess_block(array &$variables): void {
 			// Loop directly over the media entities attached to the block.
 			// Unlike the Image Carousel, videos are usually just the player,
 			// so we skip the Paragraph wrapper and render the media directly.
+			$media_view_mode = leap_lego_video_carousel_media_view_mode((string) ($content['#view_mode'] ?? ''));
 			foreach ($block->get('field_videos')->referencedEntities() as $media_entity) {
-				if ($media_entity) {
-					$build = $view_builder->view($media_entity, 'default');
-					$items[] = [
-						'media' => \Drupal::service('renderer')->render($build),
-					];
-				}
+				$build = $view_builder->view($media_entity, $media_view_mode);
+				$html = (string) \Drupal::service('renderer')->render($build);
+				$items[] = [
+					'media' => \Drupal\Core\Render\Markup::create(
+						\Drupal\leap_lego_video_carousel\VideoMetadata::scopeGallery($html, $variables['carousel_id'])
+					),
+				];
 			}
 		}
 

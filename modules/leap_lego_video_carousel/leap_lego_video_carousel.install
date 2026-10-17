@@ -24,7 +24,8 @@ function leap_lego_video_carousel_install(): void {
   $module_path = \Drupal::service('extension.list.module')->getPath('leap_lego_video_carousel');
   $command = "drush recipe $module_path/recipes/leap_lego_video_carousel";
 
-  \Drupal::messenger()->addWarning(t('The Splash Frog Legos - Video Carousel module has been enabled. <strong>To complete the setup, you must apply the associated recipe:</strong><br><br><code>@command</code>', [
+  \Drupal::messenger()->addWarning(t('The Splash Frog Legos - Video Carousel module has been enabled. <strong>To complete the setup, apply the Splash Frog media types recipe (<code>leap_media</code>) if you have not, then this recipe:</strong><br><br><code>@command</code><br><br>Videos play inline. To open them in a lightbox instead, install <code>glightbox</code> and <code>glightbox_media_video</code> and apply <code>@lightbox</code>.', [
     '@command' => $command,
+    '@lightbox' => "drush recipe $module_path/recipes/leap_lego_video_carousel_lightbox",
   ]));
 }

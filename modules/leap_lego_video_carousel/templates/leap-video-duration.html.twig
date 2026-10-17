@@ -1,0 +1,13 @@
+{#
+/**
+ * @file
+ * A duration shown as a player shows it, with the full spoken form for
+ * assistive technology.
+ *
+ * Available variables:
+ * - display: The canonical M:SS or H:MM:SS text.
+ * - spoken: The duration in words.
+ * - iso: The ISO 8601 duration for the datetime attribute.
+ */
+#}
+<time datetime="{{ iso }}"><span aria-hidden="true">{{ display }}</span><span class="visually-hidden">{{ spoken }}</span></time>

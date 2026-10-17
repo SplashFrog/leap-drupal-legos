@@ -1,0 +1,39 @@
+{#
+/**
+ * @file
+ * Default detailed card for a video in the Video Carousel: the media, then
+ * its title, summary and a meta line (provider, date, duration).
+ *
+ * A theme overrides this file by name.
+ *
+ * Available variables:
+ * - media: The media entity.
+ * - content: The rendered display.
+ * - view_mode: The view mode.
+ * - video_title: The display title.
+ * - video_provider: The provider's name, when known.
+ */
+#}
+{%
+  set classes = [
+    'media',
+    'media--type-' ~ media.bundle()|clean_class,
+    not media.isPublished() ? 'media--unpublished',
+    view_mode ? 'media--view-mode-' ~ view_mode|clean_class,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {{ title_suffix.contextual_links }}
+  {{ content|without('field_video_summary', 'field_video_date', 'field_video_duration') }}
+  <h4 class="media__title">{{ video_title }}</h4>
+  {% if content.field_video_summary %}
+    <div class="media__summary">{{ content.field_video_summary }}</div>
+  {% endif %}
+  {% if video_provider or content.field_video_date or content.field_video_duration %}
+    <div class="media__meta">
+      {% if video_provider %}<span class="media__provider">{{ video_provider }}</span>{% endif %}
+      {{ content.field_video_date }}
+      {{ content.field_video_duration }}
+    </div>
+  {% endif %}
+</div>

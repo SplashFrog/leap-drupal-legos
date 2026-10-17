@@ -1,0 +1,63 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.carousel_detailed
+    - field.field.media.remote_video.field_remote_video
+    - field.field.media.remote_video.field_video_date
+    - field.field.media.remote_video.field_video_display_title
+    - field.field.media.remote_video.field_video_duration
+    - field.field.media.remote_video.field_video_summary
+    - media.type.remote_video
+  module:
+    - datetime
+    - leap_lego_video_carousel
+    - media
+id: media.remote_video.carousel_detailed
+targetEntityType: media
+bundle: remote_video
+mode: carousel_detailed
+content:
+  field_remote_video:
+    type: oembed
+    label: hidden
+    settings:
+      max_width: 0
+      max_height: 0
+      loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_video_summary:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 10
+    region: content
+  field_video_duration:
+    type: leap_video_duration_accessible
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 20
+    region: content
+  field_video_date:
+    type: datetime_default
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 30
+    region: content
+hidden:
+  created: true
+  field_video_display_title: true
+  langcode: true
+  name: true
+  search_api_excerpt: true
+  thumbnail: true
+  uid: true

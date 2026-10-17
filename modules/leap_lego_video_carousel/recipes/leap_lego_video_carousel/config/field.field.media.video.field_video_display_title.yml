@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_video_display_title
+    - media.type.video
+id: media.video.field_video_display_title
+field_name: field_video_display_title
+entity_type: media
+bundle: video
+label: 'Alternative title'
+description: 'Overrides the title the video provider reports. Leave empty to use the provider title.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
