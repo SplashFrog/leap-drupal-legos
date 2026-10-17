@@ -1,0 +1,58 @@
+name: 'Splash Frog Legos - Video Carousel (Lightbox)'
+description: 'Optional. Opens the Video Carousel''s videos in a GLightbox popup instead of playing them inline. Apply the leap_lego_video_carousel recipe first, and install the glightbox and glightbox_media_video modules.'
+type: 'Site-Building'
+recipes:
+  - leap_lego_video_carousel
+install:
+  - glightbox
+  - glightbox_media_video
+  - image
+config:
+  strict: false
+  actions:
+    core.entity_view_display.media.remote_video.carousel:
+      setProperties: &remote_lightbox
+        content.field_remote_video:
+          type: glightbox_media_remote_video
+          label: hidden
+          settings:
+            max_width: 0
+            max_height: 0
+            loading: { attribute: lazy }
+            display: thumbnail
+            link_text: 'View Video'
+            image_style: leap_video_poster
+            glightbox_gallery: parent
+            glightbox_gallery_custom: ''
+            glightbox_caption: none
+            glightbox_caption_custom: ''
+            glightbox_caption_description: none
+            glightbox_caption_description_custom: ''
+          third_party_settings: {  }
+          weight: 0
+          region: content
+    core.entity_view_display.media.remote_video.carousel_detailed:
+      setProperties: *remote_lightbox
+    core.entity_view_display.media.video.carousel:
+      setProperties: &file_lightbox
+        content.field_video_file:
+          type: glightbox_file_video
+          label: hidden
+          settings:
+            muted: false
+            width: 640
+            height: 480
+            display: thumbnail
+            link_text: 'View Video'
+            image_style: leap_video_poster
+            glightbox_gallery: parent
+            glightbox_gallery_custom: ''
+            glightbox_caption: none
+            glightbox_caption_custom: ''
+            thumbnail_source_field: ''
+            thumbnail_source_image_style: ''
+          third_party_settings: {  }
+          weight: 0
+          region: content
+    core.entity_view_display.media.video.carousel_detailed:
+      setProperties: *file_lightbox

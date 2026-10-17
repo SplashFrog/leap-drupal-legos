@@ -6,7 +6,9 @@ description: 'Provides the Single Directory Component (SDC) and bridging logic f
 package: 'Splash Frog'
 dependencies:
   - drupal:block_content
+  - drupal:image
   - drupal:link
-  - drupal:linkit
   - drupal:media
-  - drupal:paragraphs
+  - drupal:media_library
+  - linkit:linkit
+  - link_attributes:linkit_attributes

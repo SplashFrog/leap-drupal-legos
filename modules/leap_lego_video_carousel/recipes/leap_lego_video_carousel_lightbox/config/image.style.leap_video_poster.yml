@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: leap_video_poster
+label: 'Video poster (16:9)'
+effects:
+  5a8e2f1c-6b4d-4a37-9c10-2f3d8e7b1a44:
+    uuid: 5a8e2f1c-6b4d-4a37-9c10-2f3d8e7b1a44
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 840
+      height: 472
+      anchor: center-center

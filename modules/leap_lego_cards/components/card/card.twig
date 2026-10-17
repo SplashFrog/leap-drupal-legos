@@ -1,7 +1,9 @@
 <div class="card h-100 {{ link_wrap ? 'position-relative' : '' }}">
-  {% if media %}
+  {# Empty media still renders wrappers and debug comments; only visible media counts. #}
+  {% set media_markup = media|render %}
+  {% if media_markup|striptags('<img><picture><source><video><iframe><svg>')|trim is not empty %}
     <div class="sf-card-media-wrapper">
-      {{ media }}
+      {{ media_markup }}
     </div>
   {% endif %}
   

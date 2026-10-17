@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_video_date
+    - media.type.video
+id: media.video.field_video_date
+field_name: field_video_date
+entity_type: media
+bundle: video
+label: Date
+description: 'When the video was recorded or published.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

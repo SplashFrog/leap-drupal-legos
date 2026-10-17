@@ -7,7 +7,7 @@
     <div class="mb-4">{{ body }}</div>
   {% endif %}
 
-  <div id="{{ id }}" class="carousel slide" data-bs-ride="carousel">
+  <div id="{{ id }}" class="carousel slide">
     {# Indicators #}
     <div class="carousel-indicators">
       {% for item in items %}
@@ -22,7 +22,7 @@
           {{ item.media }}
           
           {% if item.title or item.link_url %}
-            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
+            <div class="carousel-caption bg-dark bg-opacity-50 rounded p-3">
               {% if item.title %}
                 <h5>{{ item.title }}</h5>
               {% endif %}
